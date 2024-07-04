@@ -1,5 +1,6 @@
 import http from "node:http";
 import { jsonMiddleware } from "../middleware/middleware.js";
+import { routes } from "./routes.js";
 
 /* 
 O prefixo node: na importação de um módulo serve para informar que 
@@ -15,32 +16,22 @@ Adiciona aos escripts:
 
 */
 
-const users = [];
-
 const server = http.createServer(async (request, response) => {
- const { url, method } = request;
+ const { method, url } = request;
 
  await jsonMiddleware(request, response);
 
- if (method === "GET" && url === "/users") {
-  return response
-   .setHeader("Content-type", "application/json")
-   .end(JSON.stringify(users));
+ const route = routes.find((route) => {
+  return route.method == method && route.path == url;
+ });
+
+ console.log(route);
+
+ if (route) {
+  route.handler(request, response);
+ } else {
+  return response.writeHead(404).end();
  }
-
- if (method === "POST" && url === "/users") {
-  const { name, email } = request.body;
-
-  users.push({
-   id: 1,
-   name,
-   email,
-  });
-
-  return response.writeHead(201).end();
- }
-
- return response.writeHead(404).end("Hello, World!");
 });
 
 server.listen(3333);

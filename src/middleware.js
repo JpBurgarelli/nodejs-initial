@@ -1,4 +1,4 @@
-export async function jsonMiddleware(request, response) {
+export async function jsonMiddleWare2(request, response) {
  const buffers = [];
 
  for await (const chunk of request) {
